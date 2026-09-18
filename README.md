@@ -66,6 +66,10 @@ NUTRITION_PROVIDER=usda
 
 Seçilən provider SDK-sını ayrıca quraşdırın: `google-genai`, `openai` və ya `anthropic`.
 
+Docker ilə real şəkil tanıma üçün də eyni `.env` faylında `OFFLINE_MODE=false`,
+`GOOGLE_API_KEY` və `USDA_API_KEY` yazın. `docker compose up --build` bu dəyişənləri
+konteynerə ötürür. Offline rejim yalnız deterministik demo şəkilləri üçündür.
+
 ## API nümunələri
 
 ```bash
