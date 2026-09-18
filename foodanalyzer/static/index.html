@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="az">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>FoodLens AI</title><link rel="stylesheet" href="/static/style.css?v=2">
+</head>
+<body>
+  <main>
+    <nav><a class="brand" href="/">FoodLens <i>AI</i></a><span>Yeməyini tanı. Rəqəmləri bil.</span></nav>
+    <section class="hero">
+      <div><p class="eyebrow">SÜNİ İNTELLEKT İLƏ QİDALANMA ANALİZİ</p><h1>Bir şəkil.<br><em>Tam qida analizi.</em></h1><p class="intro">Yeməyinin şəklini yüklə, ingredientləri, kalorini və makroları saniyələr içində öyrən.</p></div>
+      <form id="upload">
+        <label id="drop"><input id="image" name="image" type="file" accept="image/png,image/jpeg" required><span class="icon">↥</span><strong>Şəkli bura burax</strong><small>və ya seçmək üçün kliklə · PNG/JPEG · max 8 MB</small><img id="preview" alt="Seçilmiş yemək"></label>
+        <button>Analiz et <span>→</span></button><p id="message"></p>
+      </form>
+    </section>
+    <section id="result" hidden><header><div><p class="eyebrow">ANALİZ NƏTİCƏSİ</p><h2 id="status">Yeməyin hazırdır</h2></div><span id="weight"></span></header>
+      <div class="metrics"><article><small>KALORİ</small><b id="kcal">0</b><span>kcal</span></article><article><small>PROTEİN</small><b id="protein">0</b><span>qram</span></article><article><small>KARBOHİDRAT</small><b id="carbs">0</b><span>qram</span></article><article><small>YAĞ</small><b id="fat">0</b><span>qram</span></article></div>
+      <article id="insight" hidden><p class="eyebrow">YEMƏK HAQQINDA</p><p id="insight-text"></p></article>
+      <h3>Ingredientlər</h3><div id="ingredients"></div><div id="warnings"></div>
+    </section>
+  </main>
+  <footer>FoodLens AI · SWENG Final Project <span>Nəticələr təxminidir və tibbi məsləhət deyil.</span></footer>
+  <script src="/static/app.js?v=2"></script>
+</body></html>
