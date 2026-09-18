@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import logging
 from pathlib import Path
 
@@ -8,6 +7,7 @@ from ai import Nutrition, compute_totals
 from ai.providers.base import ProviderError
 
 from foodanalyzer.models import AnalysisResponse, AnalysisStatus, IngredientResult
+from foodanalyzer.concurrency.pipeline import lookup_all
 from foodanalyzer.services.ai_service import AIService
 from foodanalyzer.services.food_insight import FoodInsightService
 from foodanalyzer.storage.repository import AnalysisRepository
@@ -33,25 +33,26 @@ class Analyzer:
             await self._save(response)
             return response
 
-        outcomes = await asyncio.gather(
-            *(self.ai_service.nutrition_for(item.name) for item in ingredients),
-            return_exceptions=True,
+        outcomes = await lookup_all(
+            ingredients,
+            lambda item: self.ai_service.nutrition_for(item.name),
+            max_concurrency=10,
         )
         facts_by_name = {}
         rows: list[IngredientResult] = []
         warnings: list[str] = []
         for ingredient, outcome in zip(ingredients, outcomes):
-            if isinstance(outcome, BaseException):
+            if outcome.error is not None:
                 message = f"{ingredient.name} üçün qida məlumatı alınmadı"
-                logger.warning(message, exc_info=outcome)
+                logger.warning(message, exc_info=outcome.error)
                 warnings.append(message)
                 rows.append(IngredientResult(ingredient=ingredient, error=message))
             else:
-                facts_by_name[ingredient.name] = outcome
+                facts_by_name[ingredient.name] = outcome.value
                 rows.append(IngredientResult(
                     ingredient=ingredient,
-                    nutrition=outcome.for_grams(ingredient.estimated_grams),
-                    nutrition_source=outcome.source,
+                    nutrition=outcome.value.for_grams(ingredient.estimated_grams),
+                    nutrition_source=outcome.value.source,
                 ))
 
         totals = compute_totals(ingredients, facts_by_name)

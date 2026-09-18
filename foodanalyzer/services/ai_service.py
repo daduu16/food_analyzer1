@@ -11,6 +11,7 @@ from ai import Ingredient, NutritionFacts, NutritionProvider, identify_ingredien
 from ai.providers.base import ProviderError, VLMProvider
 
 from foodanalyzer.services.nutrition_cache import NutritionCache
+from foodanalyzer.services.nutrition_normalizer import normalize_energy_unit
 
 
 T = TypeVar("T")
@@ -80,5 +81,6 @@ class AIService:
             base_delay=self.base_delay,
             timeout_seconds=self.timeout_seconds,
         )
+        value = normalize_energy_unit(value)
         await self.cache.set(ingredient_name, value)
         return value

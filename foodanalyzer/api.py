@@ -13,14 +13,14 @@ from fastapi.staticfiles import StaticFiles
 from ai.providers.base import ProviderError
 from foodanalyzer import __version__
 from foodanalyzer.config import get_settings
+from foodanalyzer.logging_config import configure_logging
 from foodanalyzer.dependencies import build_analyzer
 from foodanalyzer.models import AnalysisResponse, HealthResponse
 from foodanalyzer.storage.repository import MemoryRepository, PostgresRepository
 from foodanalyzer.validation import read_valid_image
 
 settings = get_settings()
-logging.basicConfig(level=getattr(logging, settings.log_level.upper(), logging.INFO),
-                    format="%(asctime)s %(levelname)s %(name)s %(message)s")
+configure_logging(settings.log_level)
 logger = logging.getLogger(__name__)
 
 

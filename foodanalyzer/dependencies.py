@@ -6,7 +6,7 @@ from foodanalyzer.analyzer import Analyzer
 from foodanalyzer.config import Settings
 from foodanalyzer.offline import OfflineNutritionProvider, OfflineVLM
 from foodanalyzer.services.ai_service import AIService
-from foodanalyzer.services.cache import NutritionCache
+from foodanalyzer.services.nutrition_cache import NutritionCache
 from foodanalyzer.services.food_insight import FoodInsightService
 from foodanalyzer.storage.repository import AnalysisRepository
 
@@ -17,7 +17,7 @@ def build_analyzer(settings: Settings, repository: AnalysisRepository | None = N
     service = AIService(
         nutrition, vlm=vlm, cache=NutritionCache(settings.cache_ttl_seconds),
         attempts=settings.retry_attempts, base_delay=settings.retry_base_delay,
-        max_concurrency=settings.max_concurrency,
+        timeout_seconds=settings.request_timeout_seconds,
     )
     insight = FoodInsightService(offline=settings.offline_mode, attempts=settings.retry_attempts,
                                  base_delay=settings.retry_base_delay)

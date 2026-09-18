@@ -7,6 +7,8 @@ services:
       OFFLINE_MODE: ${OFFLINE_MODE:-true}
       DATABASE_URL: postgresql://foodlens:foodlens@db:5432/foodlens
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    volumes:
+      - uploads_data:/app/uploads
     depends_on:
       db:
         condition: service_healthy
@@ -28,3 +30,4 @@ services:
 
 volumes:
   postgres_data:
+  uploads_data:
