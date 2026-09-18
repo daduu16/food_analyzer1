@@ -1,0 +1,30 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      OFFLINE_MODE: ${OFFLINE_MODE:-true}
+      DATABASE_URL: postgresql://foodlens:foodlens@db:5432/foodlens
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: postgres:16-alpine
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: foodlens
+      POSTGRES_USER: foodlens
+      POSTGRES_PASSWORD: foodlens
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U foodlens -d foodlens"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  postgres_data:
