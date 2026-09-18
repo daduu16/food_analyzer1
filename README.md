@@ -90,6 +90,18 @@ Bütün testlər provider şəbəkəsinə çıxmadan işləyir:
 pytest --cov=foodanalyzer --cov-report=term-missing
 ```
 
+## AI sorğusu, keş, retry və konkurensiya
+
+`AIService` verilən `ai.identify_ingredients` və nutrition provider çağırışlarını bir adapterdə saxlayır.
+Hər provider sorğusunda timeout, exponential backoff və kiçik jitter ilə retry tətbiq olunur;
+son cəhddən sonra aydın `ProviderError` qaytarılır. Bu, USDA və VLM müvəqqəti əlçatan olmadıqda
+partial nəticə göstərməyə imkan verir.
+
+`NutritionCache` ingredient adını normallaşdırır və nəticəni 24 saat (`CACHE_TTL_SECONDS=86400`)
+yadda saxlayır. Nutrition lookup-ları `asyncio.gather` ilə paralel işlədir, `Semaphore(10)` isə
+eyni anda provider-ə göndərilən sorğuların sayını məhdudlaşdırır. Beləliklə bir ingredientdə yaranan
+xəta qalan ingredientlərin nəticəsini ləğv etmir.
+
 ## Arxitektura
 
 ```text
