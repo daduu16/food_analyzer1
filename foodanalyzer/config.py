@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     max_concurrency: int = Field(default=10, ge=1, le=50)
     retry_attempts: int = Field(default=5, ge=1, le=8)
     retry_base_delay: float = Field(default=1.0, ge=0)
+    request_timeout_seconds: float = Field(default=20.0, gt=0, le=120)
 
 
 @lru_cache
