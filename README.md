@@ -90,6 +90,54 @@ Bütün testlər provider şəbəkəsinə çıxmadan işləyir:
 pytest --cov=foodanalyzer --cov-report=term-missing
 ```
 
+## AI sorğusu, keş, retry və konkurensiya
+
+`AIService` verilən `ai.identify_ingredients` və nutrition provider çağırışlarını bir adapterdə saxlayır.
+Hər provider sorğusunda timeout, exponential backoff və kiçik jitter ilə retry tətbiq olunur;
+son cəhddən sonra aydın `ProviderError` qaytarılır. Bu, USDA və VLM müvəqqəti əlçatan olmadıqda
+partial nəticə göstərməyə imkan verir.
+
+`NutritionCache` ingredient adını normallaşdırır və nəticəni 24 saat (`CACHE_TTL_SECONDS=86400`)
+yadda saxlayır. Nutrition lookup-ları `asyncio.gather` ilə paralel işlədir, `Semaphore(10)` isə
+eyni anda provider-ə göndərilən sorğuların sayını məhdudlaşdırır. Beləliklə bir ingredientdə yaranan
+xəta qalan ingredientlərin nəticəsini ləğv etmir.
+
+## PostgreSQL, loqlama və Docker
+
+`DATABASE_URL` verildikdə analiz tarixçəsi `analyses` PostgreSQL cədvəlində saxlanılır.
+Sxemdə analiz ID-si, vaxtı, fayl adı, şəkil yolu və tam JSON cavabı var. Repository `asyncpg`
+connection pool istifadə edir; `DATABASE_URL` yoxdursa development üçün yaddaş repository-si seçilir.
+
+Loqlama səviyyəsi `.env` faylındakı `LOG_LEVEL` ilə təyin edilir. Məsələn, daha ətraflı
+çıxış üçün `LOG_LEVEL=DEBUG` yazın.
+
+Tam sistemi bir əmrlə başladın:
+
+```bash
+docker compose up --build
+```
+
+API `http://localhost:8000`, lokal PostgreSQL isə `localhost:5433` ünvanında açılır.
+
+## Benchmark: ardıcıl və paralel sorğu
+
+`scripts/bench.py` eyni gecikməli I/O əməliyyatlarını ardıcıl və `asyncio.gather` +
+`Semaphore` ilə paralel müqayisə edir:
+
+```bash
+python scripts/bench.py --items 10 --delay-ms 100 --concurrency 10
+```
+
+Nümunə nəticə (10 item, hər biri 100 ms, concurrency 10):
+
+| Rejim | Vaxt |
+| --- | ---: |
+| Ardıcıl | təxminən 1.00 s |
+| Paralel | təxminən 0.10 s |
+
+Bu I/O-bound ssenaridə paralel pipeline təxminən 10× sürətlənir. Faktiki nəticə şəbəkə və
+provider gecikməsindən asılıdır.
+
 ## Arxitektura
 
 ```text
