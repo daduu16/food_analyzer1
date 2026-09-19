@@ -102,7 +102,7 @@ Loqlama səviyyəsi `.env` faylındakı `LOG_LEVEL` ilə təyin edilir. Məsəl�
 Tam sistemi bir əmrlə başladın:
 
 ```bash
-docker compose up --build
+docker compose up --build   # multiple container run etmek ucun
 ```
 
 API `http://localhost:8000`, lokal PostgreSQL isə `localhost:5433` ünvanında açılır.
